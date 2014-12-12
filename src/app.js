@@ -1,6 +1,6 @@
 var Stomp = require('stomp-client');
 
-var destination = '/queue/electricity/metrics';
+var destination = '/topic/electricity/metrics';
 var user = process.env.ACTIVEMQ_USER;
 var pass = process.env.ACTIVEMQ_PASSWORD;
 var port = 61613;
