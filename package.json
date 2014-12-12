@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "stomp-client": "^0.5.0"
+  }
+}
