@@ -36,11 +36,17 @@ function mongodbConnect(MongoClient, url) {
 Q.all([activemqConnect(client), mongodbConnect(MongoClient, url)]).spread(function(sessionId, db) {
   console.log("Connected to activemq and mongodb");
 
+  var collection = db.collection("metrics");
+
   client.subscribe(destination, function(body, headers) {
     var metrics = JSON.parse(body);
     console.log('Message received:', metrics);
-  });
 
-  db.close();
+    collection.insert(metrics, function(err, result) {
+      if (err) {
+        throw err;
+      }
+    });
+  });
 }).done();
 
