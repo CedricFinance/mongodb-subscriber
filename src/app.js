@@ -33,19 +33,14 @@ function mongodbConnect(MongoClient, url) {
   return deferred.promise;
 }
 
-activemqConnect(client).then(function(sessionId) {
-  console.log("Connected to activemq");
+Q.all([activemqConnect(client), mongodbConnect(MongoClient, url)]).spread(function(sessionId, db) {
+  console.log("Connected to activemq and mongodb");
 
   client.subscribe(destination, function(body, headers) {
     var metrics = JSON.parse(body);
     console.log('Message received:', metrics);
   });
-});
-
-mongodbConnect(MongoClient, url).then(function(db) {
-  console.log("Connected to mongodb");
 
   db.close();
-}, function(error) {
-  console.log("Error when connecting to mongodb", error);
-});
+}).done();
+
