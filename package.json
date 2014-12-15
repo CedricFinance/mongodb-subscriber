@@ -1,5 +1,7 @@
 {
   "dependencies": {
-    "stomp-client": "^0.5.0"
+    "stomp-client": "^0.5.0",
+    "mongodb": "^1.4.23",
+     "q": "^1.1.2"
   }
 }
