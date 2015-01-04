@@ -14,13 +14,9 @@ function activemqConnect(mq_config) {
   return deferred.promise;
 }
 
-function mongodbConnect(mongo_config) {
-  var MongoClient = require('mongodb').MongoClient;
-  var connect = Q.denodeify(MongoClient.connect);
-  return connect(mongo_config.url);
-}
+var mongodb_connect = require('./mongodb_connect');
 
-Q.all([activemqConnect(config.activemq), mongodbConnect(config.mongo)]).spread(function(client, db) {
+Q.all([activemqConnect(config.activemq), mongodb_connect(config.mongo)]).spread(function(client, db) {
   console.log("Connected to activemq and mongodb");
 
   var collection = db.collection("raw_metrics");
