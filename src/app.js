@@ -40,6 +40,7 @@ Q.all([activemqConnect(client), mongodbConnect(MongoClient, url)]).spread(functi
 
   client.subscribe(destination, function(body, headers) {
     var metrics = JSON.parse(body);
+    metrics.date = new Date(metrics.date);
     console.log('Message received:', metrics);
 
     collection.insert(metrics, function(err, result) {
