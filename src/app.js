@@ -1,5 +1,4 @@
 var Stomp = require('stomp-client');
-var MongoClient = require('mongodb').MongoClient;
 var Q = require('q');
 var config = require('./config');
 
@@ -15,19 +14,13 @@ function activemqConnect(client) {
   return deferred.promise;
 }
 
-function mongodbConnect(MongoClient, url) {
-  var deferred = Q.defer();
-  MongoClient.connect(url, function(err, db) {
-    if (err) {
-      deferred.reject(err);
-    } else {
-      deferred.resolve(db);
-    }
-  });
-  return deferred.promise;
+function mongodbConnect(url) {
+  var MongoClient = require('mongodb').MongoClient;
+  var connect = Q.denodeify(MongoClient.connect);
+  return connect(url);
 }
 
-Q.all([activemqConnect(client), mongodbConnect(MongoClient, config.url)]).spread(function(sessionId, db) {
+Q.all([activemqConnect(client), mongodbConnect(config.url)]).spread(function(sessionId, db) {
   console.log("Connected to activemq and mongodb");
 
   var collection = db.collection("raw_metrics");
