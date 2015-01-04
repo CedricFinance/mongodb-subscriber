@@ -1,15 +1,9 @@
 var Stomp = require('stomp-client');
 var MongoClient = require('mongodb').MongoClient;
 var Q = require('q');
+var config = require('./config');
 
-var destination = '/topic/electricity/metrics';
-var user = process.env.ACTIVEMQ_USER;
-var pass = process.env.ACTIVEMQ_PASSWORD;
-var port = 61613;
-var url = 'mongodb://mongo/electricity';
-
-var client = new Stomp('mq', port, user, pass);
-
+var client = new Stomp('mq', config.port, config.user, config.pass);
 
 function activemqConnect(client) {
   var deferred = Q.defer();
@@ -33,12 +27,12 @@ function mongodbConnect(MongoClient, url) {
   return deferred.promise;
 }
 
-Q.all([activemqConnect(client), mongodbConnect(MongoClient, url)]).spread(function(sessionId, db) {
+Q.all([activemqConnect(client), mongodbConnect(MongoClient, config.url)]).spread(function(sessionId, db) {
   console.log("Connected to activemq and mongodb");
 
   var collection = db.collection("raw_metrics");
 
-  client.subscribe(destination, function(body, headers) {
+  client.subscribe(config.destination, function(body, headers) {
     var metrics = JSON.parse(body);
     metrics.date = new Date(metrics.date);
     console.log('Message received:', metrics);
