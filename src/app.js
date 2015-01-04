@@ -1,22 +1,9 @@
 var Q = require('q');
 var config = require('./config');
-
-function activemqConnect(mq_config) {
-  var Stomp = require('stomp-client');
-  var client = new Stomp(mq_config.alias, mq_config.port, mq_config.user, mq_config.pass);
-
-  var deferred = Q.defer();
-  client.connect(function(sessionId) {
-    deferred.resolve(client);
-  }).on('error', function(err) {
-    deferred.reject(new Error(err));
-  });
-  return deferred.promise;
-}
-
+var activemq_connect = require('./activemq_connect');
 var mongodb_connect = require('./mongodb_connect');
 
-Q.all([activemqConnect(config.activemq), mongodb_connect(config.mongo)]).spread(function(client, db) {
+Q.all([activemq_connect(config.activemq), mongodb_connect(config.mongo)]).spread(function(client, db) {
   console.log("Connected to activemq and mongodb");
 
   var collection = db.collection("raw_metrics");
